@@ -1,0 +1,11 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: php7.3-docker-0.1
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www/html

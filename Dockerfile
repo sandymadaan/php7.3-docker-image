@@ -10,6 +10,12 @@ EXPOSE 80
 
 WORKDIR /var/www/html
 
+RUN apt-get -y update && apt-get install -y curl \
+    && curl -sL https://deb.nodesource.com/setup_4.x | bash \
+    && apt-get -y install nodejs && apt-get -y install npm
+RUN npm install -g npm@latest
+RUN npm install -g newman
+
 RUN apt-get -y update \
     && apt-get install -y git unzip libicu-dev libpq-dev \
     && docker-php-ext-configure intl \
