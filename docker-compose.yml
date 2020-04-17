@@ -3,9 +3,9 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: php7.3-docker-0.1
+      dockerfile: Dockerfilenewrelic
+    image: sandymadaan/php7.3-newrelic:0.5
     ports:
-      - 8080:80
+      - 8082:80
     volumes:
       - .:/var/www/html

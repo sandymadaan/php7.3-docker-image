@@ -1,3 +1,4 @@
+#FROM postgres:10
 FROM php:7.3-apache
 
 LABEL maintainer="SandyMadaan"
@@ -9,6 +10,14 @@ RUN a2enmod rewrite
 EXPOSE 80
 
 WORKDIR /var/www/html
+
+RUN apt-get -y update && apt-get install -y curl \
+    && curl -sL https://deb.nodesource.com/setup_4.x | bash \
+    && apt-get -y install nodejs && apt-get -y install npm
+RUN npm install -g npm@latest
+RUN npm install -g newman
+
+RUN newman --version
 
 RUN apt-get -y update \
     && apt-get install -y git unzip libicu-dev libpq-dev \
@@ -29,6 +38,8 @@ RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee
 
 RUN apt-get -y update
 
+RUN apt -y update
+
 RUN apt -y install apt-utils
 
 RUN apt policy php7.3-cli
@@ -44,7 +55,9 @@ RUN bash -c "echo extension=grpc.so > /usr/local/etc/php/conf.d/grpc.ini"
 
 RUN service apache2 restart
 
+
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
+

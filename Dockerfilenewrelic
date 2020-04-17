@@ -10,10 +10,20 @@ EXPOSE 80
 
 WORKDIR /var/www/html
 
+#install newman
+RUN apt-get -y update && apt-get install -y curl \
+    && curl -sL https://deb.nodesource.com/setup_4.x | bash \
+    && apt-get -y install nodejs && apt-get -y install npm
+RUN npm install -g npm@latest
+RUN npm install -g newman
+
+RUN newman --version
+
+#PHP extensions
 RUN apt-get -y update \
-    && apt-get install -y git unzip libicu-dev libpq-dev \
+    && apt-get install -y git unzip libicu-dev libpq-dev libpng-dev \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install intl mbstring pdo pdo_mysql pdo_pgsql \
+    && docker-php-ext-install intl mbstring pdo pdo_mysql pdo_pgsql gd \
     && apt-get install -y php7.3-sqlite
 
 RUN apt-get -y update \
@@ -29,6 +39,8 @@ RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee
 
 RUN apt-get -y update
 
+RUN apt -y update
+
 RUN apt -y install apt-utils
 
 RUN apt policy php7.3-cli
@@ -39,12 +51,22 @@ RUN apt policy php-pear
 
 RUN pecl install grpc
 
+#install supervisor
+Run apt-get -y install supervisor
 
 RUN bash -c "echo extension=grpc.so > /usr/local/etc/php/conf.d/grpc.ini"
 
 RUN service apache2 restart
 
+#Install NewRelic
+RUN echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' | sudo tee /etc/apt/sources.list.d/newrelic.list
+RUN wget -O- https://download.newrelic.com/548C16BF.gpg | sudo apt-key add -
+RUN apt-get update
+RUN apt-get install -y newrelic-php5
+
+#Composer Setup
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
+
